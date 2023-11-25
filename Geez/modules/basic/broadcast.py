@@ -12,6 +12,8 @@ kopas repo dan hapus credit, ga akan jadikan lu seorang developer
 YANG NYOLONG REPO INI TRUS DIJUAL JADI PREM, LU GAY...
 ©2023 Geez | Ram Team
 """
+import aiocron
+import os
 import asyncio
 import dotenv
 from pyrogram import Client, enums, filters
@@ -42,34 +44,49 @@ def get_arg(message: Message):
 
 blchat = []
 
-@Client.on_message(filters.command("ggcast", "*") & filters.user(DEVS))
+MESSAGE = os.environ.get("GCAST_MESSAGE")
+INTERVAL = int(os.environ.get("INTERVAL", 60))
+
+@aiocron.crontab(f'0 */{INTERVAL} * * *')
+async def scheduled_gcast(client: Client):
+    try:
+        done = 0
+        error = 0
+        async for dialog in client.get_dialogs():
+            if dialog.chat.type in (enums.ChatType.GROUP, enums.ChatType.SUPERGROUP):
+                chat = dialog.chat.id
+                if chat not in BL_GCAST and chat not in BLACKLIST_GCAST:
+                    try:
+                        await client.send_message(chat, MESSAGE)
+                        done += 1
+                        await asyncio.sleep(0.3)
+                    except Exception:
+                        error += 1
+                        await asyncio.sleep(0.3)
+        print(f"Broadcast sent successfully to {done} groups, failed in {error} groups.")
+    except Exception as e:
+        # Log the exception or print the traceback
+        print(f"Error in scheduled_gcast: {e}")
+
 @geez("gcast", cmds)
 async def gcast_cmd(client: Client, message: Message):
-    if message.reply_to_message or get_arg(message):
-        tex = await message.reply_text("`Memulai Gcast...`")
-    else:
-        return await message.edit_text("**Give A Message or Reply**")
+    await message.reply(f"gcast berhasil diaktifkan dengan interval {INTERVAL} menit. Pesan: {MESSAGE}")
+
     done = 0
     error = 0
     async for dialog in client.get_dialogs():
         if dialog.chat.type in (enums.ChatType.GROUP, enums.ChatType.SUPERGROUP):
-            if message.reply_to_message:
-                msg = message.reply_to_message
-            elif get_arg:
-                msg = get_arg(message)
             chat = dialog.chat.id
             if chat not in BL_GCAST and chat not in BLACKLIST_GCAST:
                 try:
-                    if message.reply_to_message:
-                        await msg.copy(chat)
-                    elif get_arg:
-                        await client.send_message(chat, msg)
+                    await client.send_message(chat, MESSAGE)
                     done += 1
                     await asyncio.sleep(0.3)
                 except Exception:
                     error += 1
                     await asyncio.sleep(0.3)
-    await tex.edit_text(
+    
+    await message.edit_text(
         f"**Berhasil mengirim ke** `{done}` **Groups chat, Gagal mengirim ke** `{error}` **Groups**"
     )
 
@@ -169,8 +186,8 @@ async def delblacklist(client: Client, message: Message):
 add_command_help(
     "broadcast",
     [
-        [f"{cmds}gcast [text/reply]",
-            "Broadcast pesan ke Group. (bisa menggunakan Media/Sticker)"],
+        [f"{cmds}gcast",
+            "memulai broadcast schedule"],
         [f"{cmds}gucast [text/reply]",
             "Broadcast pesan ke semua chat. (bisa menggunakan Media/Sticker)"],
         [f"{cmds}addblacklist [id group]",

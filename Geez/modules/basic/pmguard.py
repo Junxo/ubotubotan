@@ -1,7 +1,7 @@
 from pyrogram import filters, Client
 from pyrogram.types import Message
 from geezlibs import DEVS
-from geezlibs.geez import geez, devs
+from geezlibs.geez import geez
 from geezlibs.geez.utils.geezlogs import izzy_meira
 from geezlibs.geez.database.pmpermit import get_approved_users, pm_guard, allow_user
 from geezlibs.geez.database import pmpermit as TOD
