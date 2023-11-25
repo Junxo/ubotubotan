@@ -1,5 +1,6 @@
 aiofiles
 aiohttp
+aiocron
 APScheduler==3.7.0
 blackpink
 bs4

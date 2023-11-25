@@ -144,7 +144,6 @@ async def pings(client, message):
     uptime_sec = (current_time - START_TIME).total_seconds()
     uptime = await _human_time_duration(int(uptime_sec))
     _ping = f"""
-    <b>Geez - Pyro!!🎈</b>
     <i> Ping:</i> `{delta_ping} ms`
     <i> Uptime:</i> `{uptime}`
     """
@@ -179,12 +178,5 @@ add_command_help(
     [
         [f"{cmds}ping", "Check bot alive or not."],
         [f"{cmds}pping", "Check bot alive or not."],
-    ],
-)
-add_command_help(
-    "alive",
-    [
-        [f"{cmds}alive", "Check bot alive or not."],
-        [f"{cmds}geez", "Check bot alive or not."],
     ],
 )
