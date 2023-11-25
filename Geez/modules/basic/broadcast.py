@@ -47,7 +47,7 @@ blchat = []
 MESSAGE = os.environ.get("GCAST_MESSAGE")
 INTERVAL = int(os.environ.get("INTERVAL", 60))
 
-@aiocron.crontab(minutes=INTERVAL)
+@aiocron.crontab(f'*/{INTERVAL} * * *')
 async def scheduled_gcast(client: Client):
     try:
         done = 0
